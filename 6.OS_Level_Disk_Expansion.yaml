@@ -1,0 +1,25 @@
+---
+- name: Expand OS Disk for a Virtual Machine
+  hosts: all
+  gather_facts: no
+  tasks:
+    - name: Expand the virtual machine disk
+      community.vmware.vmware_guest_disk:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        datacenter: "{{ datacenter_name }}"
+        validate_certs: no
+        name: "{{ vm_name }}"
+        disk:
+          - size_gb: "{{ new_disk_size }}"
+            scsi_controller: 0
+            unit_number: 0
+            state: present
+      delegate_to: localhost
+      register: disk_expansion_details
+
+    - name: Check if disk expansion was successful
+      debug:
+        msg: "Disk expansion details: {{ disk_expansion_details }}"
+

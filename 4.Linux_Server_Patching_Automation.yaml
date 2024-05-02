@@ -1,0 +1,32 @@
+---
+- name: Automate Linux Server Patching
+  hosts: linux_servers
+  become: yes
+  tasks:
+    - name: Check for available updates
+      ansible.builtin.yum:
+        list: updates
+      register: yum_updates
+      when: ansible_os_family == "RedHat"
+
+    - name: Upgrade all packages to the latest version
+      ansible.builtin.yum:
+        name: '*'
+        state: latest
+      when: ansible_os_family == "RedHat" and yum_updates.results|length > 0
+
+    - name: Check for available updates (Debian/Ubuntu)
+      ansible.builtin.apt:
+        update_cache: yes
+        cache_valid_time: 3600
+      register: apt_updates
+      when: ansible_os_family == "Debian"
+
+    - name: Upgrade all packages to the latest version (Debian/Ubuntu)
+      ansible.builtin.apt:
+        upgrade: 'dist'
+      when: ansible_os_family == "Debian" and apt_updates.changed
+
+    - name: Reboot the server if required
+      ansible.builtin.reboot:
+      when: yum_updates.results|length > 0 or apt_updates.changed

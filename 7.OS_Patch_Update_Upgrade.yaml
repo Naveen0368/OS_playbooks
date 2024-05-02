@@ -1,0 +1,29 @@
+---
+- name: Delete OS Snapshot After Patching
+  hosts: all
+  become: yes
+  tasks:
+    - name: Check for existing snapshot
+      community.vmware.vmware_guest_snapshot:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        datacenter: "{{ datacenter_name }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        snapshot_name: "{{ snapshot_to_delete }}"
+      register: snapshot_details
+      delegate_to: localhost
+
+    - name: Remove snapshot if it exists
+      community.vmware.vmware_guest_snapshot:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        datacenter: "{{ datacenter_name }}"
+        validate_certs: no
+        name: "{{ inventory_hostname }}"
+        snapshot_name: "{{ snapshot_to_delete }}"
+        state: absent
+      when: snapshot_details.snapshots | length > 0
+      delegate_to: localhost

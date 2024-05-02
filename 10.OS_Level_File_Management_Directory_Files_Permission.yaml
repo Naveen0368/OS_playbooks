@@ -1,0 +1,30 @@
+---
+- name: OS Level File Management
+  hosts: all
+  become: yes
+  tasks:
+    - name: Create a directory
+      ansible.builtin.file:
+        path: /path/to/directory
+        state: directory
+        mode: '0755'
+        owner: root
+        group: root
+
+    - name: Create a file in the directory
+      ansible.builtin.copy:
+        dest: /path/to/directory/file.txt
+        content: |
+          This is a sample file created by Ansible.
+        mode: '0644'
+        owner: root
+        group: root
+
+    - name: Set permissions for the file
+      ansible.builtin.file:
+        path: /path/to/directory/file.txt
+        state: file
+        mode: '0644'
+        owner: root
+        group: root
+

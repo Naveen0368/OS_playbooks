@@ -1,0 +1,51 @@
+---
+- name: Configure SNMP on Linux Servers
+  hosts: linux_servers
+  become: yes
+  tasks:
+    - name: Install SNMP packages
+      ansible.builtin.package:
+        name: snmpd
+        state: present
+
+    - name: Configure SNMP daemon
+      ansible.builtin.template:
+        src: /path/to/your/snmpd.conf.j2
+        dest: /etc/snmp/snmpd.conf
+        owner: root
+        group: root
+        mode: '0644'
+      notify: Restart snmpd
+
+    - name: Ensure SNMP service is running and enabled
+      ansible.builtin.service:
+        name: snmpd
+        state: started
+        enabled: yes
+
+  handlers:
+    - name: Restart snmpd
+      ansible.builtin.service:
+        name: snmpd
+        state: restarted
+
+- name: Configure SNMP on Windows Servers
+  hosts: windows_servers
+  tasks:
+    - name: Configure SNMP service
+      community.windows.win_snmp:
+        contact: 'Your Contact'
+        location: 'Your Location'
+        communities:
+          - name: 'public'
+            rights: 'read_only'
+          - name: 'private'
+            rights: 'read_write'
+        traps:
+          - host: '192.0.2.1'
+            community: 'public'
+        services:
+          - 'Physical'
+          - 'Applications'
+          - 'End-to-End'
+

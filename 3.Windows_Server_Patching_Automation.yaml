@@ -1,0 +1,24 @@
+---
+- name: Automate Windows Server Patching
+  hosts: windows_servers
+  tasks:
+    - name: Install required PowerShell module for Windows updates
+      win_shell: |
+        Install-Module -Name PSWindowsUpdate -Force -SkipPublisherCheck
+      become: yes
+      become_method: runas
+
+    - name: Register scheduled task for updates
+      win_scheduled_task:
+        name: "WindowsUpdates"
+        description: "Automate Windows Server Patching"
+        actions:
+          - path: "powershell.exe"
+            arguments: "Get-WindowsUpdate -Install -AcceptAll -AutoReboot"
+        triggers:
+          - type: "weekly"
+            day_of_week: "sun"
+            start_boundary: "2024-05-01T03:00:00"
+        state: present
+        enabled: yes
+

@@ -1,0 +1,27 @@
+---
+- name: OS Level Package Management
+  hosts: all
+  become: yes
+  tasks:
+    - name: Install a list of packages
+      ansible.builtin.package:
+        name: "{{ packages }}"
+        state: present
+
+    - name: Remove a list of packages
+      ansible.builtin.package:
+        name: "{{ packages_to_remove }}"
+        state: absent
+
+    - name: Update all packages to the latest version
+      ansible.builtin.package:
+        name: '*'
+        state: latest
+      when: ansible_os_family != "Windows"
+
+    - name: Ensure a list of packages are at the latest version
+      ansible.builtin.package:
+        name: "{{ packages }}"
+        state: latest
+      when: ansible_os_family != "Windows"
+

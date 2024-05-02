@@ -1,0 +1,14 @@
+---
+- name: Configure OS Level Kernel Parameters
+  hosts: all
+  become: yes
+  tasks:
+    - name: Set kernel parameter
+      ansible.posix.sysctl:
+        name: kernel.example_parameter
+        value: 'example_value'
+        state: present
+        reload: yes
+        sysctl_set: yes
+        ignoreerrors: no
+

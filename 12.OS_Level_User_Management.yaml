@@ -1,0 +1,29 @@
+---
+- name: OS Level User Management
+  hosts: all
+  become: yes
+  vars:
+    user_name: 'exampleuser'
+    user_password: 'securepassword'
+    user_state: 'present' # Use 'absent' to remove the user
+    user_groups: 'sudo' # Additional groups the user should be added to
+    user_shell: '/bin/bash' # The default shell for the user
+    ssh_public_key: 'ssh-rsa AAAAB3Nza... user@example.com'
+
+  tasks:
+    - name: Ensure the user '{{ user_name }}' is added/removed
+      ansible.builtin.user:
+        name: "{{ user_name }}"
+        password: "{{ user_password | password_hash('sha512') }}"
+        state: "{{ user_state }}"
+        groups: "{{ user_groups }}"
+        append: yes
+        shell: "{{ user_shell }}"
+        createhome: yes
+
+    - name: Set authorized key for the user '{{ user_name }}'
+      ansible.builtin.authorized_key:
+        user: "{{ user_name }}"
+        state: "{{ user_state }}"
+        key: "{{ ssh_public_key }}"
+

@@ -1,0 +1,10 @@
+---
+- name: OS Level Service Management
+  hosts: all
+  become: yes
+  tasks:
+    - name: Ensure the 'example_service' is running
+      ansible.builtin.service:
+        name: example_service
+        state: started
+        enabled: yes

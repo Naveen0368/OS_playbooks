@@ -1,0 +1,27 @@
+---
+- name: Upgrade VMware Tools on Linux Servers
+  hosts: linux_servers
+  gather_facts: no
+  tasks:
+    - name: Get VM UUID
+      community.vmware.vmware_guest_facts:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        datacenter: "{{ datacenter }}"
+        folder: "/{{ datacenter }}/vm"
+        name: "{{ inventory_hostname }}"
+        validate_certs: no
+      delegate_to: localhost
+      register: vm_facts
+
+    - name: Upgrade VMware Tools using UUID
+      community.vmware.vmware_guest_tools_upgrade:
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        datacenter: "{{ datacenter_name }}"
+        uuid: "{{ vm_facts.instance.hw_product_uuid }}"
+        validate_certs: no
+      delegate_to: localhost
+

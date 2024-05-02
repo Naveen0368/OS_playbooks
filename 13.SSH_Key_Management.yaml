@@ -1,0 +1,15 @@
+---
+- name: SSH Key Management
+  hosts: all
+  become: yes
+  vars:
+    user_name: 'exampleuser'
+    ssh_public_key: 'ssh-rsa AAAAB3Nza... user@example.com'
+    state: 'present' # Use 'absent' to remove the key
+
+  tasks:
+    - name: Add or remove SSH authorized key
+      ansible.posix.authorized_key:
+        user: "{{ user_name }}"
+        state: "{{ state }}"
+        key: "{{ ssh_public_key }}"
